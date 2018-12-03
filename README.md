@@ -4,7 +4,20 @@
 
 To run the application one can just type:
 ```
-sbt "run World!"
+> sbt "app/run World!"
+```
+
+## Build
+
+The application can be build using:
+```
+> sbt "app/nativeLink"
+```
+and run via:
+```
+> cd ./app/target/scala-2.11
+> ./app-out World
+Hello, World!
 ```
 
 ## Navigation

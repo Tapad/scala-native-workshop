@@ -1,6 +1,17 @@
-scalaVersion := "2.11.12"
+inThisBuild {
+  Seq(
+    scalaVersion := "2.11.12",
+    nativeLinkStubs := true // Set to false or remove if you want to show stubs as linking errors
+  )
+}
 
-// Set to false or remove, if you want to show stubs as linking errors
-nativeLinkStubs := true
+lazy val root = project
+  .in(new File("."))
+  .aggregate(app, common)
 
-enablePlugins(ScalaNativePlugin)
+lazy val common = project
+  .enablePlugins(ScalaNativePlugin)
+
+lazy val app = project
+  .enablePlugins(ScalaNativePlugin)
+  .dependsOn(common)
