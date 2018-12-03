@@ -24,6 +24,10 @@ and run via:
 Hello, World!
 ```
 
+## Verbosity
+
+The application can run in a debug mode if `--debug` arguments is passed in.
+
 ## Navigation
 
 The SBT's `groll` command is used to navigate between the commits of this workshop.
