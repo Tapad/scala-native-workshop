@@ -4,7 +4,11 @@
 
 To run the application one can just type:
 ```
-> sbt "app/run World!"
+> sbt "app/run --exclamation World"
+```
+or just print help message using:
+```
+> sbt "app/run --help"
 ```
 
 ## Build
