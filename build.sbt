@@ -25,7 +25,8 @@ lazy val app = project
   .settings(
     libraryDependencies ++= Seq(
       "org.rogach" %%% "scallop" % "3.1.5",
-      "biz.enef" %%% "slogging" % "0.6.1"
+      "biz.enef" %%% "slogging" % "0.6.1",
+      "com.softwaremill.sttp" %%% "core" % "1.5.0"
     )
   )
-  .dependsOn(common, curl)
+  .dependsOn(common)
