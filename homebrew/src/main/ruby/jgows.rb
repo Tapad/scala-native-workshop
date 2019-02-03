@@ -4,6 +4,7 @@ class Jgows < Formula
 
   url "https://nexus.tapad.com/repository/releases/com/tapad/workshop/jgows/{{ version }}/jgows-{{ version }}.zip"
   sha256 "{{ checksum }}"
+  version "{{ version }}"
 
   depends_on "curl" => "7.56.0"
 
