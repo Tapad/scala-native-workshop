@@ -30,6 +30,7 @@ lazy val homebrew = project
     mappings in Universal += (resourceDirectory in Compile).value / "Makefile" -> "Makefile",
     Compile / packageBin := (Universal / packageBin).value,
     publishLocal := (publishLocal in Universal).value,
+    publish := (publish in Universal).value,
     homebrewTapRepository := "git@github.com:jgogstad/homebrew-testtap.git",
     homebrewTapRepositoryPath := "formulas/jgows.rb",
     homebrewFormula := sourceDirectory.value / "main" / "ruby" / "jgows.rb",
