@@ -20,7 +20,8 @@ resolvers += "Tapad Aggregate" at "https://nexus.tapad.com/repository/aggregate"
 
 lazy val root = (project in file("."))
   .settings(ReleaseSettings)
-  .aggregate(app, common, curl)
+  .settings(publish := {})
+  .aggregate(app, common, curl, homebrew)
 
 lazy val homebrew = project
   .settings(
@@ -28,7 +29,10 @@ lazy val homebrew = project
     name in Universal := "jgows",
     topLevelDirectory := None,
     mappings in Universal += (resourceDirectory in Compile).value / "Makefile" -> "Makefile",
-    Compile / packageBin := (Universal / packageBin).value,
+    Compile / packageBin := {
+      homebrewFormulaRender.value
+      (Universal / packageBin).value
+    },
     publishLocal := (publishLocal in Universal).value,
     publish := (publish in Universal).value,
     homebrewTapRepository := "git@github.com:jgogstad/homebrew-testtap.git",
