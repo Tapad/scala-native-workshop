@@ -21,27 +21,32 @@ resolvers += "Tapad Aggregate" at "https://nexus.tapad.com/repository/aggregate"
 lazy val root = (project in file("."))
   .settings(ReleaseSettings)
   .settings(publish := {})
-  .aggregate(app, common, curl, homebrew)
+  .aggregate(app, common, curl, homebrew, makefile)
 
-lazy val homebrew = project
+lazy val makefile = project
   .settings(
     packageName in Universal := s"jgows-${version.value}",
     name in Universal := "jgows",
     topLevelDirectory := None,
     mappings in Universal += (resourceDirectory in Compile).value / "Makefile" -> "Makefile",
-    Compile / packageBin := {
-      homebrewFormulaRender.value
-      (Universal / packageBin).value
-    },
+    Compile / packageBin := (Universal / packageBin).value,
     publishLocal := (publishLocal in Universal).value,
-    publish := (publish in Universal).value,
+    publish := (publish in Universal).value
+)
+  .enablePlugins(UniversalPlugin, UniversalDeployPlugin)
+
+lazy val homebrew = project
+  .settings(
     homebrewTapRepository := "git@github.com:jgogstad/homebrew-testtap.git",
     homebrewTapRepositoryPath := "formulas/jgows.rb",
     homebrewFormula := sourceDirectory.value / "main" / "ruby" / "jgows.rb",
-    homebrewFormulaChecksum := FormulaUtils.sha256((Compile / packageBin).value)
+    homebrewFormulaChecksum := FormulaUtils.sha256((makefile / Compile / packageBin).value),
+    Compile / packageBin := homebrewFormulaRender.value,
+    publishLocal := {},
+    publish := homebrewFormulaCommitAndPush.value
   )
-  .enablePlugins(UniversalPlugin, UniversalDeployPlugin, HomebrewPlugin)
-  .dependsOn(app)
+  .enablePlugins(HomebrewPlugin)
+  .dependsOn(makefile, app)
 
 lazy val common = project
   .enablePlugins(ScalaNativePlugin)

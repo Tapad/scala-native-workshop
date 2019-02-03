@@ -25,7 +25,7 @@ An extended task is to set up a full release pipeline that would increment versi
 
 ### Makefile
 
-The [`Makefile`](homebrew/src/main/resources/Makefile) provides a platform agnostic entrypoint for linking the application with [coursier]. Test it out:
+The [`Makefile`](makefile/src/main/resources/Makefile) provides a platform agnostic entrypoint for linking the application with [coursier]. Test it out:
 
 ```
 $ sbt publishLocal
