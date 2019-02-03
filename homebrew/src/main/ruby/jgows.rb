@@ -1,8 +1,8 @@
-class Myapp < Formula
+class Jgows < Formula
   desc "Scala Native Workshop"
   homepage "https://github.com/Tapad/scala-native-workshop"
 
-  url "http://nexus.tapad.com/{{ version }}/zips/myapp.zip"
+  url "https://nexus.tapad.com/repository/releases/com/tapad/workshop/jgows/{{ version }}/jgows-{{ version }}.zip"
   sha256 "{{ checksum }}"
 
   depends_on "curl" => "7.56.0"

@@ -37,6 +37,7 @@ lazy val homebrew = project
     homebrewFormulaChecksum := FormulaUtils.sha256((Compile / packageBin).value)
   )
   .enablePlugins(UniversalPlugin, UniversalDeployPlugin, HomebrewPlugin)
+  .dependsOn(app)
 
 lazy val common = project
   .enablePlugins(ScalaNativePlugin)
