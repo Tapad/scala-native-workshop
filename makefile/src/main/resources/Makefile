@@ -18,5 +18,5 @@ build: $(BUILDPATH)/coursier
 ifndef VERSION
 	$(error Please provide version, 'make VERSION=x.y.z')
 else
-	export LDFLAGS='-L/usr/local/opt/curl/lib'; $(BUILDPATH)/coursier bootstrap --native com.tapad.workshop:app_native$(SCALA_NATIVE_VERSION):$(VERSION) -r ivy2local -r https://$(USER):$(PASSWORD)@nexus.tapad.com/repository/aggregate -o $(TARGET)/app
+	export LDFLAGS='-L/usr/local/opt/curl/lib'; export _JAVA_OPTIONS="-Xmx1g"; $(BUILDPATH)/coursier bootstrap --native com.tapad.workshop:app_native$(SCALA_NATIVE_VERSION):$(VERSION) -r ivy2local -r https://$(USER):$(PASSWORD)@nexus.tapad.com/repository/aggregate -o $(TARGET)/app
 endif

@@ -15,14 +15,15 @@ class Jgows < Formula
     abort("No credentials found in #{@@credentials_file}")
   end
 
-  username_encoded = URI.encode(username)
-  password_encoded = URI.encode(password)
-
   url "https://#{username}:#{password}@nexus.tapad.com/repository/releases/com/tapad/workshop/jgows/{{ version }}/jgows-{{ version }}.zip"
   sha256 "{{ checksum }}"
   version "{{ version }}"
 
   depends_on "curl" => "7.56.0"
+  depends_on "llvm" => :build
+  depends_on "bdw-gc"
+  depends_on "re2"
+  depends_on "libidn"
 
   def install
     system "make", "VERSION={{ version }}", "BUILDPATH=#{buildpath}", "CREDENTIALS=#{@@credentials_file}"
@@ -32,4 +33,6 @@ class Jgows < Formula
   test do
     system "#{bin}/app", "--version"
   end
+
+  caveats "If you're on Linux, please install re2, unwind and gc for your distribution. See https://github.com/scala-native/scala-native/blob/master/docs/user/setup.rst"
 end
