@@ -25,7 +25,7 @@ class Jgows < Formula
   depends_on "curl" => "7.56.0"
 
   def install
-    system "make", "VERSION={{ version }}", "BUILDPATH=#{buildpath}", "CREDENTIALS=#{credentials_file]}"
+    system "make", "VERSION={{ version }}", "BUILDPATH=#{buildpath}", "CREDENTIALS=#{credentials_file}"
     bin.install "app"
   end
 
