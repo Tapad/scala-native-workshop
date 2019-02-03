@@ -7,8 +7,8 @@ CURRENT_DIR = $(shell pwd)
 BUILDPATH := $(CURRENT_DIR)/buildpath
 TARGET := $(CURRENT_DIR)
 
-USER := $(shell awk -F '=' '/user/{ print $$2 }' < $(HOME)/.ivy2/.credentials)
-PASSWORD := $(shell awk -F '=' '/password/{ print $$2 }' < $(HOME)/.ivy2/.credentials)
+USER := $(shell awk -F '=' '/user/{ print $$2 }' < $(CREDENTIALS))
+PASSWORD := $(shell awk -F '=' '/password/{ print $$2 }' < $(CREDENTIALS))
 
 $(BUILDPATH)/coursier:
 	mkdir -p $(BUILDPATH)
