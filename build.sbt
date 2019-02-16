@@ -1,12 +1,18 @@
+import sbt.Keys.organization
+
 inThisBuild {
   Seq(
     scalaVersion := "2.11.12",
-    nativeLinkStubs := true // Set to false or remove if you want to show stubs as linking errors
+    nativeLinkStubs := true, // Set to false or remove if you want to show stubs as linking errors
+    organization := "com.tapad.workshop"
   )
 }
 
-lazy val root = project
-  .in(new File("."))
+lazy val root = (project in file("."))
+  .settings(
+    publish := {},
+    publishLocal := {}
+  )
   .aggregate(app, common, curl)
 
 lazy val common = project
