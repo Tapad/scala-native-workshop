@@ -9,6 +9,7 @@ inThisBuild {
     publishArtifact in Test := false,
     version in ThisBuild ~= (_.replace('+', '-')),
     dynver in ThisBuild ~= (_.replace('+', '-')),
+    publishMavenStyle := false,
     publishTo := Some(Resolver.defaultLocal)
   )
 }
@@ -24,9 +25,10 @@ lazy val root = (project in file("."))
 lazy val homebrew = project
   .settings(
     homebrewFormula := sourceDirectory.value / "main" / "ruby" / "tws.rb",
+    homebrewFormulaChecksum := FormulaUtils.sha256((makefile / Compile / packageBin).value),
     publishMavenStyle := false,
     crossVersion := Disabled(),
-    addArtifact(Artifact("homebrew", "formulae", "rb"), homebrewFormulaRender)
+    addArtifact(Artifact("tws", "formulae", "rb"), homebrewFormulaRender)
   )
   .dependsOn(makefile, app)
   .enablePlugins(HomebrewPlugin)
