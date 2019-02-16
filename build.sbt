@@ -1,10 +1,14 @@
+import com.tapad.platform.sbt.homebrew.FormulaUtils
 import sbt.Keys.organization
 
 inThisBuild {
   Seq(
     scalaVersion := "2.11.12",
     nativeLinkStubs := true, // Set to false or remove if you want to show stubs as linking errors
-    organization := "com.tapad.workshop"
+    organization := "com.tapad.workshop",
+    publishArtifact in Test := false,
+    version in ThisBuild ~= (_.replace('+', '-')),
+    dynver in ThisBuild ~= (_.replace('+', '-'))
   )
 }
 
@@ -13,7 +17,18 @@ lazy val root = (project in file("."))
     publish := {},
     publishLocal := {}
   )
-  .aggregate(app, common, curl, makefile)
+  .settings(Release.ReleaseSettings)
+  .aggregate(app, common, curl, makefile, homebrew)
+
+lazy val homebrew = project
+  .settings(
+    homebrewFormula := sourceDirectory.value / "main" / "ruby" / "tws.rb",
+    publishMavenStyle := false,
+    crossVersion := Disabled(),
+    addArtifact(Artifact("homebrew", "formulae", "rb"), homebrewFormulaRender)
+  )
+  .dependsOn(makefile, app)
+  .enablePlugins(HomebrewPlugin)
 
 lazy val makefile = project
   .settings(
@@ -23,7 +38,7 @@ lazy val makefile = project
     mappings in Universal += ((Compile / resourceDirectory).value / "Makefile") -> "Makefile",
     Compile / packageBin := (Universal / packageBin).value,
     publishLocal := (publishLocal in Universal).value,
-    publish := (publish in Universal).value
+    publish := (publishLocal in Universal).value
   )
   .enablePlugins(UniversalPlugin, UniversalDeployPlugin)
 
@@ -32,10 +47,13 @@ lazy val common = project
   .settings(
     libraryDependencies ++= Seq(
       "biz.enef" %%% "slogging" % "0.6.1"
-    )
+    ),
+    publish := (publishLocal in Compile).value
   )
 
 lazy val curl = project
+    .settings(
+      publish := (publishLocal in Compile).value)
   .enablePlugins(ScalaNativePlugin)
 
 lazy val app = project
@@ -45,7 +63,8 @@ lazy val app = project
       "org.rogach" %%% "scallop" % "3.1.5",
       "biz.enef" %%% "slogging" % "0.6.1",
       "com.softwaremill.sttp" %%% "core" % "1.5.0"
-    )
+    ),
+    publish := (publishLocal in Compile).value
   )
   .settings(
     Compile / mainClass := Some("com.tapad.app.Main"),
