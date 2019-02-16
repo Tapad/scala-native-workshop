@@ -8,7 +8,8 @@ inThisBuild {
     organization := "com.tapad.workshop",
     publishArtifact in Test := false,
     version in ThisBuild ~= (_.replace('+', '-')),
-    dynver in ThisBuild ~= (_.replace('+', '-'))
+    dynver in ThisBuild ~= (_.replace('+', '-')),
+    publishTo := Some(Resolver.defaultLocal)
   )
 }
 
@@ -38,7 +39,7 @@ lazy val makefile = project
     mappings in Universal += ((Compile / resourceDirectory).value / "Makefile") -> "Makefile",
     Compile / packageBin := (Universal / packageBin).value,
     publishLocal := (publishLocal in Universal).value,
-    publish := (publishLocal in Universal).value
+    publish := (publish in Universal).value
   )
   .enablePlugins(UniversalPlugin, UniversalDeployPlugin)
 
@@ -47,13 +48,10 @@ lazy val common = project
   .settings(
     libraryDependencies ++= Seq(
       "biz.enef" %%% "slogging" % "0.6.1"
-    ),
-    publish := (publishLocal in Compile).value
+    )
   )
 
 lazy val curl = project
-    .settings(
-      publish := (publishLocal in Compile).value)
   .enablePlugins(ScalaNativePlugin)
 
 lazy val app = project
@@ -63,8 +61,7 @@ lazy val app = project
       "org.rogach" %%% "scallop" % "3.1.5",
       "biz.enef" %%% "slogging" % "0.6.1",
       "com.softwaremill.sttp" %%% "core" % "1.5.0"
-    ),
-    publish := (publishLocal in Compile).value
+    )
   )
   .settings(
     Compile / mainClass := Some("com.tapad.app.Main"),
