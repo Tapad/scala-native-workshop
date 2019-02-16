@@ -35,4 +35,11 @@ lazy val app = project
       "com.softwaremill.sttp" %%% "core" % "1.5.0"
     )
   )
+  .settings(
+    Compile / mainClass := Some("com.tapad.app.Main"),
+    nativeCompileOptions += "-I/usr/local/opt/curl/include"
+  )
+  .settings( // Provide linking settings for linking from SBT
+    nativeLinkStubs := true,
+    nativeLinkingOptions += "-L/usr/local/opt/curl/lib")
   .dependsOn(common)
