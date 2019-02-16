@@ -13,7 +13,19 @@ lazy val root = (project in file("."))
     publish := {},
     publishLocal := {}
   )
-  .aggregate(app, common, curl)
+  .aggregate(app, common, curl, makefile)
+
+lazy val makefile = project
+  .settings(
+    packageName in Universal := s"tws-${version.value}",
+    name in Universal := "tws",
+    topLevelDirectory := None,
+    mappings in Universal += ((Compile / resourceDirectory).value / "Makefile") -> "Makefile",
+    Compile / packageBin := (Universal / packageBin).value,
+    publishLocal := (publishLocal in Universal).value,
+    publish := (publish in Universal).value
+  )
+  .enablePlugins(UniversalPlugin, UniversalDeployPlugin)
 
 lazy val common = project
   .enablePlugins(ScalaNativePlugin)
