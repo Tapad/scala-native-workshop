@@ -1,5 +1,7 @@
 # Scala Native Workshop
 -----
+### Sample slides follow
+-----
 # The LLVM Compiler Infrastructure
 
 * Umbrella term, not an acronym. LLVM is the name of the project
@@ -51,17 +53,34 @@ This is not good vs bad, it's just different approaches to producing assembly la
 
 ![LLVM pipeline](img/LLVMCompiler1.png) 
 
------
-# Build pipeline
+---
 
-![Build pipeline](img/nativeworkshop.png)
+### Potential slide for talking about working with pointers, dereferencing etc
+
+Also possible to talk about GraalVM, JNI, unsafe
+
+-----
+# Goal for distribution
+
+When users does `brew install tws`:
+
+* Homebrew should use pre-linked binaries for the user's OS
+* If no binaries are available, Homebrew should link the NIR code on the user's localhost to produce a binary 
+
+---
+
+# Distribution plan
+
+* `sbt publishLocal` produces JAR files with NIR files
+* Publish JARs to Nexus as usual
+* Make CI produce linked binaries and update formula with necessary code
 
 -----
 # 7 - Coursier
 
 > Pure artifact fetching
-
-* Takes maven coordinates as input
+ 
+* Coursier takes maven coordinates as input
 * Integrates with Scala Native
 * Can produce natively linked artifact as output
 
@@ -70,16 +89,11 @@ This is not good vs bad, it's just different approaches to producing assembly la
 --- 
 # 7 - Coursier
 
-## Task
-
-* Use [coursier](https://github.com/coursier/coursier) to link a macOS or Linux binary from the application JARs
-* Add your coursier command to the supplied `Makefile`
+Use [coursier](https://github.com/coursier/coursier) to link a macOS or Linux binary from the application JARs. Add your coursier command to the supplied `Makefile`.
 
 ## Goal
 
 * Run `make` to generate binary (hard coded version number is fine for now)
-
-## Verify
 
 ```bash
 $ cd makefile/src/main/resources
@@ -100,7 +114,7 @@ We'll use homebrew to
 
 ---
 
-## Essential terminology
+## Homebrew terminology
 
 * `Bottle`: Pre-built binary for a given OS and CPU architecture
 * `Tap`: Git repository containing `Formulas`
@@ -110,15 +124,11 @@ See the complete list in the [Formula cookbook](https://docs.brew.sh/Formula-Coo
 
 ---
 
+Create a homebrew formula for the application. Fill out the missing parts of the formula at `homebrew/src/main/ruby/tws.rb`
+
 ## Goal
 
 * Create a homebrew formula that runs the Makefile you created in the previous step 
-
-## Task
-
-* Fill out the missing parts of the formula at `homebrew/src/main/ruby/tws.rb`
-
-## Verify
 
 ```bash
 $ sbt release
@@ -135,17 +145,26 @@ So far we have what we need to assemble binaries for various platforms. Now we'r
 
 ---
 
-## Task
+Create scripts that are run by CI on pull requests and master branch
 
-* Create scripts that are run by CI on pull requests and master branch
+* `pr.sh`: Should generate binary for the operating system it's run on
+* `master.sh`: Should push binaries to Bintray and update Formula on master
 
 ## Goal
 
 * Create a pre-linked binary for your operating system and surface it through homebrew
 
-## Verify
+Homebrew should use the bottle when clients install the application
 
-* `brew install tws` should install `tws` from a pre-linked binary -- not build from source 
+```bash
+$ brew install tws
+==> Installing tws from jgogstad/testtap
+==> Downloading https://dl.bintray.com/jgogstad/bottles-testtap/tws-0.5.0.high_sierra.bottle.tar.gz
+######################################################################## 100.0%
+==> Pouring tws-0.5.0.high_sierra.bottle.tar.gz
+🍺  /usr/local/Cellar/tws/0.5.0: 3 files, 7.3MB
+$
+```
 
 -----
 # Power of Markdown in your presentation
