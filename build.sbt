@@ -15,4 +15,9 @@ lazy val common = project
 
 lazy val app = project
   .enablePlugins(ScalaNativePlugin)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.rogach" %%% "scallop" % "3.1.5"
+    )
+  )
   .dependsOn(common)
