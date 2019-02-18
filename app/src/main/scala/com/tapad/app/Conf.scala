@@ -13,6 +13,9 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
   val exclamationMark =
     toggle(name = "exclamation", short = 'e', default = Some(false))
 
+  val verbose =
+    toggle(name = "verbose", noshort = true, default = Some(false))
+
   val name = trailArg[String](name = "name", default = Some("World"))
 
   footer(
