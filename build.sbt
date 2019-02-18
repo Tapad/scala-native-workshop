@@ -26,6 +26,7 @@ lazy val root = (project in file("."))
 lazy val homebrew = project
   .settings(
     homebrewFormula := sourceDirectory.value / "main" / "ruby" / "tws.rb",
+    homebrewFormulaChecksum := FormulaUtils.sha256((makefile / Compile / packageBin).value),
     crossVersion := Disabled(),
     addArtifact(Artifact("tws", "formulae", "rb"), homebrewFormulaRender)
   )
