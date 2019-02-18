@@ -1,7 +1,7 @@
 package com.tapad.app
 
+import com.softwaremill.sttp._
 import com.tapad.common.Greeting
-import com.tapad.curl.CurlHttp
 import slogging._
 
 object Main {
@@ -18,7 +18,8 @@ object Main {
     val greet = Greeting.greet(conf.name(), conf.exclamationMark())
     println(greet)
 
-    val ip = CurlHttp.get("https://api.ipify.org")
+    implicit val backend: SttpBackend[Id, Nothing] = CurlBackend(verbose = conf.verbose())
+    val ip = sttp.get(uri"https://api.ipify.org").send().unsafeBody
 
     println(s"Your IP is: $ip")
   }
