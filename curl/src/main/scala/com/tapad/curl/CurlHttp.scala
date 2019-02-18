@@ -35,5 +35,13 @@ object CurlHttp {
     responseBody
   }
 
-  private def writeMemoryCallback(contents: Ptr[Byte], size: CSize, nmemb: CSize, userp: Ptr[MemoryStruct]): CSize = ???
+  private def writeMemoryCallback(contents: Ptr[Byte], size: CSize, nmemb: CSize, userp: Ptr[MemoryStruct]): CSize = {
+    val realSize: CSize = size * nmemb
+    val index: CSize = !userp._2
+    !userp._2 = !userp._2 + realSize
+    !userp._1 = realloc(!userp._1, !userp._2 + 1)
+    memcpy(!userp._1 + index, contents, realSize)
+    !((!userp._1) + (!userp._2)) = 0.toByte
+    realSize
+  }
 }
