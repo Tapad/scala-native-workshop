@@ -26,11 +26,12 @@ lazy val app = project
   .settings(
     libraryDependencies ++= Seq(
       "org.rogach" %%% "scallop" % "3.1.5",
-      "biz.enef" %%% "slogging" % "0.6.1"
+      "biz.enef" %%% "slogging" % "0.6.1",
+      "com.softwaremill.sttp" %%% "core" % "1.5.0"
     )
   )
   .settings(
-    nativeCompileOptions += "-I???", // likely -I/usr/local/opt/curl/include
-    nativeLinkingOptions += "-L???" // likely -L/usr/local/opt/curl/lib
+    nativeCompileOptions += "-I/usr/local/opt/curl/include",
+    nativeLinkingOptions += "-L/usr/local/opt/curl/lib"
   )
   .dependsOn(common, curl)
