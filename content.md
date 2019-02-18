@@ -1,14 +1,88 @@
 # Scala Native Workshop
 -----
-### Sample slides follow
+# Scala Native
+
+> Scala Native is an optimizing ahead-of-time compiler and lightweight managed runtime designed specifically for Scala<br>
+> _- scala-native.org_
+
+Scala Native can take a Scala program with objects, traits, higher kinded types etc. and translate it down to the same the same kind of executable machine code that you would've got from a C compiler.
+
 -----
-# The LLVM Compiler Infrastructure
+
+# Scala Native
+
+> Systems programming is the art of writing code while remaining aware of the properties and limitations of the machine that will run it.<br>
+> _- Modern Systems Programming with Scala Native_
+
+In addition, Scala Native adds powerful capabilities to work closer with the "bare metal"
+
+* Elementary data types such as `struct`s, `pointer`s, low-level byte strings etc. are easy to work with. No need for `JNI` or `Unsafe`.
+* Use system level shared libraries and C-style memory management
+* Reuse existing tools and infrastructure in the Scala/Java ecosystem
+
+Note: These techniques allows us to essentially replace C programs with Scala.
+
+* Smaller memory footprint
+* No JIT warmup phase at application startup
+* Reuse the existing Scala and Java ecosystem
+  * Build with SBT and publish to Maven Central as usual
+  * Use ScalaTest and friends
+    
+
+-----
+# In this workshop
+
+* We're going to create a CLI that links with `libcurl` and invokes remote HTTP APIs
+* Package and distribute the application source code as well as pre-linked binaries
+
+Note: Don't worry about what "pre-linked binaries" mean
+
+# Pawel: Getting started / minimal sbt project
+
+Also possible to talk about GraalVM, JNI, unsafe
+
+-----
+
+### Task slides 4-7
+
+-----
+
+### Pointers, extern etc.
+
+-----
+
+### Task slides curl
+
+-----
+# Linking
+
+The first version of our application is now finished. Now we only need to link it do the target operating systems we plan to support and distribute it.
+
+### Plan
+
+* Link the application up-front to a set of operating systems and CPU architectures
+* Distribute source code along with linked binaries through Homebrew
+
+Note: I promised to explain "pre-linked binaries". Let's see what's happening under the hood. 
+
+-----
+# What _is_ Scala Native
+
+* Scala Native is not a "native compiler"
+* It's a "LLVM frontend"
+
+-----
+
+# LLVM Compiler Infrastructure
+
+> Despite its name, LLVM has little to do with traditional virtual machines.<br>
+> _- llvm.org_
 
 * Umbrella term, not an acronym. LLVM is the name of the project
-* It's a closely coupled set of compilers, linkers, assemblers, debuggers, static analyzers etc. that works well together
+* It's a "closely knit" set of compilers, linkers, assemblers, debuggers, static analyzers etc. that works well together
 * Can be used to compile various high level languages to various platforms, CPU architectures etc.  
 
----
+-----
 
 # LLVM overview
 
@@ -16,11 +90,14 @@ Multiple "frontends" are compiled to an intermediary representation (IR) which i
 
 ![LLVM pipeline](img/LLVMCompiler1.png)
 
+Note: This is not LLVM specific, all modern compilers looks like this
+
+Compare with the JVM: Scala, Groovy, Jython etc.
+
+Backends doesn't have to be AOT. Wide variety: There's also a JIT backend for IR, or you could compile C++ to Java Byte Code.
 
 ---
 # LLVM and the JVM
-
-> Despite its name, LLVM has little to do with traditional virtual machines.
 
 * LLVM and the JVM are register and stack machines respectively
 * LLVM IR is a much lower level representation than Java Byte Code
@@ -38,60 +115,43 @@ This is not good vs bad, it's just different approaches to producing assembly la
 
 # Terminology refresh
 
-* What is an application
+* What is an executable file, or "binary"?
 * AOT and JIT compilers
 * Intermediate representation (IR)
 * Compiling vs linking applications
 * Static and dynamic linking
 
+Note:
+
+Application: x86 + syscalls + executable file format (entry point, exit code, etc.)
+AOT/JIT: Certain optimizations only possible in AOT and JIT respectively
+Static & dynamic linking <=> Fat jars or not
 
 -----
-# What is Scala Native
-
-* It's not a "native compiler"
-* It's a LLVM frontend that generates IR (or NIR strictly speaking)
-
-![LLVM pipeline](img/LLVMCompiler1.png) 
-
----
-
-### Potential slide for talking about working with pointers, dereferencing etc
-
-Also possible to talk about GraalVM, JNI, unsafe
-
------
-# Goal for distribution
-
-When users does `brew install tws`:
-
-* Homebrew should use pre-linked binaries for the user's OS
-* If no binaries are available, Homebrew should link the NIR code on the user's localhost to produce a binary 
-
----
-
 # Distribution plan
 
-* `sbt publishLocal` produces JAR files with NIR files
-* Publish JARs to Nexus as usual
+* `sbt package` produces JAR files with NIR files
+* Publish JARs to Nexus as usual\*
 * Make CI produce linked binaries and update formula with necessary code
 
+\* In this workshop we're using localhost instead
 -----
 # 7 - Coursier
 
-> Pure artifact fetching
+> Pure artifact fetching <br>+<br>JAR ⇒ Binary
  
-* Coursier takes maven coordinates as input
+* `Coursier` takes maven coordinates as input
 * Integrates with Scala Native
 * Can produce natively linked artifact as output
 
 ![coursier](img/coursier-launch.gif)
 
---- 
+----- 
 # 7 - Coursier
 
 Use [coursier](https://github.com/coursier/coursier) to link a macOS or Linux binary from the application JARs. Add your coursier command to the supplied `Makefile`.
 
-## Goal
+### Goal
 
 * Run `make` to generate binary (hard coded version number is fine for now)
 
@@ -112,7 +172,7 @@ We'll use homebrew to
 * Ensure that dynamically linked libraries are available, install them if not
 * Make pre-built binaries of our application available to our users
 
----
+-----
 
 ## Homebrew terminology
 
@@ -126,7 +186,7 @@ See the complete list in the [Formula cookbook](https://docs.brew.sh/Formula-Coo
 
 Create a homebrew formula for the application. Fill out the missing parts of the formula at `homebrew/src/main/ruby/tws.rb`
 
-## Goal
+### Goal
 
 * Create a homebrew formula that runs the Makefile you created in the previous step 
 
@@ -145,12 +205,14 @@ So far we have what we need to assemble binaries for various platforms. Now we'r
 
 ---
 
+## 9 - Building bottles
+
 Create scripts that are run by CI on pull requests and master branch
 
 * `pr.sh`: Should generate binary for the operating system it's run on
 * `master.sh`: Should push binaries to Bintray and update Formula on master
 
-## Goal
+### Goal
 
 * Create a pre-linked binary for your operating system and surface it through homebrew
 
