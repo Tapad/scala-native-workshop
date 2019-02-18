@@ -27,8 +27,13 @@ lazy val homebrew = project
   .settings(
     homebrewFormula := sourceDirectory.value / "main" / "ruby" / "tws.rb",
     homebrewFormulaChecksum := FormulaUtils.sha256((makefile / Compile / packageBin).value),
+    homebrewTapRepository := "???", // "e.g. jgogstad/testtap"
     crossVersion := Disabled(),
     addArtifact(Artifact("tws", "formulae", "rb"), homebrewFormulaRender)
+  )
+  .settings(
+    GithuPullRequest,
+    publish := createPullRequest.value
   )
   .dependsOn(makefile, app)
   .enablePlugins(HomebrewPlugin)

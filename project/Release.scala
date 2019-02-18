@@ -1,10 +1,23 @@
+import com.tapad.platform.sbt.homebrew.HomebrewPlugin
 import sbtrelease.ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseStepCommandAndRemaining, _}
 import sbtrelease.ReleaseStateTransformations.{checkSnapshotDependencies, pushChanges, runClean, tagRelease, _}
 import sbtrelease._
 import sbt._
 import sbt.Keys._
+import HomebrewPlugin.autoImport._
 
 object Release {
+
+  val createPullRequest: TaskKey[Unit] = taskKey("Create pull request to tapRepository")
+  
+  val GithuPullRequest = {
+    createPullRequest := {
+      import scala.sys.process._
+      val repository = homebrewTapRepository.value
+      val file = HomebrewPlugin.autoImport.homebrewFormulaRender.value
+      s"scripts/create_pr.sh $repository $file".!!
+    }
+  }
 
   val ReleaseSettings = Seq(
     releaseVersion := { // Bump version on release

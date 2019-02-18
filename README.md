@@ -10,6 +10,7 @@
 6. [Using STTP for HTTP requests](./6_sttp.md)
 7. [Coursier](7_coursier.md)
 8. [Homebrew](8_homebrew.md)
+9. [Creating Homebrew Bottles](9_bottles.md)
 
 ## Navigation
 
