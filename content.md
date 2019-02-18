@@ -83,7 +83,17 @@ Useful for short-running command-line applications or applications where garbage
 
 ---
 
-Is GraalVM a real threat to Scala Native?
+## Is GraalVM a real threat to Scala Native?
+
+Yes and no.
+
+#### Scala Native key differentiators:
+
+* low-level memory semantics, with elegant support to arrays, structs, and pointer arithmetic
+
+* one can switch from close-to-metal code to idiomatic Scala seamlessly
+
+* more suitable for systems programming glue-up code
 
 -----
 
