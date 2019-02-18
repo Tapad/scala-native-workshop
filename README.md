@@ -3,6 +3,7 @@
 ## Content
 
 1. [Hello, World!](./1_hello_world.md)
+2. [Library and application](./2_lib_and_app.md)
 
 ## Navigation
 
