@@ -29,4 +29,8 @@ lazy val app = project
       "biz.enef" %%% "slogging" % "0.6.1"
     )
   )
+  .settings(
+    nativeCompileOptions += "-I???", // likely -I/usr/local/opt/curl/include
+    nativeLinkingOptions += "-L???" // likely -L/usr/local/opt/curl/lib
+  )
   .dependsOn(common, curl)

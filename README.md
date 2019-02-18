@@ -6,6 +6,7 @@
 1. [Parsing CLI arguments](./2_parsing_cli.md)
 1. [Logging](./3_logging.md)
 1. [Curl based HTTP requests](./4_curl_request.md)
+1. [Using STTP for HTTP requests](./5_sttp.md)
 
 ## Navigation
 
