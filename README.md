@@ -9,6 +9,7 @@
 5. [Curl based HTTP requests](./5_curl_request.md)
 6. [Using STTP for HTTP requests](./6_sttp.md)
 7. [Coursier](7_coursier.md)
+8. [Homebrew](8_homebrew.md)
 
 ## Navigation
 

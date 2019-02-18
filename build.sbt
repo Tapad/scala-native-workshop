@@ -1,16 +1,36 @@
+import com.tapad.platform.sbt.homebrew.FormulaUtils
+import Release._
+
 inThisBuild {
   Seq(
     scalaVersion := "2.11.12",
     nativeLinkStubs := true, // Set to false or remove if you want to show stubs as linking errors
-    organization := "com.tapad.workshop"
+    organization := "com.tapad.workshop",
+    publishArtifact in Test := false,
+    version in ThisBuild ~= (_.replace('+', '-')),
+    dynver in ThisBuild ~= (_.replace('+', '-')),
+    publishMavenStyle := false,
+    publishTo := Some(Resolver.defaultLocal)
   )
 }
 
 lazy val root = (project in file("."))
   .settings(
-    name := "tws" // For "Tapad Workshop"
+    name := "tws", // For "Tapad Workshop"
+    publish := {},
+    publishLocal := {}
   )
-  .aggregate(app, common, curl, makefile)
+  .settings(Release.ReleaseSettings)
+  .aggregate(app, common, curl, makefile, homebrew)
+
+lazy val homebrew = project
+  .settings(
+    homebrewFormula := sourceDirectory.value / "main" / "ruby" / "tws.rb",
+    crossVersion := Disabled(),
+    addArtifact(Artifact("tws", "formulae", "rb"), homebrewFormulaRender)
+  )
+  .dependsOn(makefile, app)
+  .enablePlugins(HomebrewPlugin)
 
 lazy val makefile = project
   .settings(
