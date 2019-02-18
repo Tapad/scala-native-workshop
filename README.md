@@ -6,6 +6,7 @@
 2. [Library and application](./2_lib_and_app.md)
 3. [Parsing CLI arguments](./3_parsing_cli.md)
 4. [Logging](./4_logging.md)
+5. [Curl based HTTP requests](./5_curl_request.md)
 
 ## Navigation
 

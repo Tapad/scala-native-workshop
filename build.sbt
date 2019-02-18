@@ -8,7 +8,7 @@ inThisBuild {
 
 lazy val root = project
   .in(new File("."))
-  .aggregate(app, common)
+  .aggregate(app, common, curl)
 
 lazy val common = project
   .enablePlugins(ScalaNativePlugin)
@@ -18,6 +18,9 @@ lazy val common = project
     )
   )
 
+lazy val curl = project
+  .enablePlugins(ScalaNativePlugin)
+
 lazy val app = project
   .enablePlugins(ScalaNativePlugin)
   .settings(
@@ -26,4 +29,4 @@ lazy val app = project
       "biz.enef" %%% "slogging" % "0.6.1"
     )
   )
-  .dependsOn(common)
+  .dependsOn(common, curl)
