@@ -30,28 +30,263 @@ Note: These techniques allows us to essentially replace C programs with Scala.
     
 
 -----
+
 # In this workshop
 
-* We're going to create a CLI that links with `libcurl` and invokes remote HTTP APIs
+* We're going to create a CLI that invokes remote HTTP APIs
 * Package and distribute the application source code as well as pre-linked binaries
 
 Note: Don't worry about what "pre-linked binaries" mean
 
-# Pawel: Getting started / minimal sbt project
+-----
 
-Also possible to talk about GraalVM, JNI, unsafe
+# Minimal setup
+
+The officially supported way:
+```
+sbt new scala-native/scala-native.g8
+```
+but we have got something special:
+```
+git clone git@github.com:Tapad/scala-native-workshop.git
+```
++
+```
+brew install llvm
+brew install bdw-gc re2 # optional
+```
+-----
+
+# Basic SBT commands
+| | |
+|-|-|
+|compile	| Compile Scala code to NIR|
+|run	    | Compile, link and run the generated binary|
+|nativeLink	| Link NIR and generate native binary|
+
+---
+
+# Garbage Collection
+
+## immix (default)
+
+Immix is a mostly-precise mark-region tracing garbage collector.
+
+## boehm
+
+Conservative generational garbage collector.
+
+## none (experimental)
+
+Garbage collector that allocates things without ever freeing them.
+Useful for short-running command-line applications or applications where garbage collections pauses are not acceptable.
+
+---
+
+Is GraalVM a real threat to Scala Native?
 
 -----
 
-### Task slides 4-7
+### Task 1 -- Getting started
+
+In the cloned project run `sbt`, and `groll initial`.
+Then,
+```
+sbt> run <your-name>
+```
 
 -----
 
-### Pointers, extern etc.
+### Task 2
+
+```
+sbt> groll next
+```
+
+Split the logic into library and application.
+* Create a library with a function that generates a `greeting` for a given name.
+* Build the binary, and run it outside of SBT.
+
+### Worth looking
+
+Check out intermediate representation in a `.nir` file.
+NIR [docs](https://github.com/scala-native/scala-native/blob/master/docs/contrib/nir.rst).
 
 -----
 
-### Task slides curl
+### Task 3
+
+```
+sbt> groll next
+```
+
+Parse CLI arguments.
+* support toggle `--exclamation` which adds `!` after the greeting, and `name` to greet as the last parameter
+* `--help` should print out a help message
+
+### Hints
+
+We can use regular Scala library (e.g. `scallop` in this case).
+
+Normally in SBT, `%%` adds Scala version suffix (e.g. `_2.11`),
+
+whereas `%%%` adds also Scala Native Version (e.g. `_0.3_2.11`).
+
+-----
+
+### Task 4
+
+```
+sbt> groll next
+```
+
+Add logging capabilities to your application.
+
+The application should support running in a debug mode if `--debug` arguments is passed in.
+
+### Hints
+
+Consider [Slogging](https://github.com/jokade/slogging#scala-native) or your own solution.
+
+-----
+
+# Interoperability with C
+
+
+---
+
+### Basic memory management
+
+```
+Zone { implicit z =>
+  val buffer = alloc[Byte](n)
+}
+```
+or well-known `stdlib` and `libc` functions:
+```
+def malloc(size: CSize): Ptr[Byte]
+```
+```
+def calloc(num: CSize, size: CSize): Ptr[Byte]
+```
+```
+def realloc(ptr: Ptr[Byte], newSize: CSize): Ptr[Byte]
+```
+```
+def free(ptr: Ptr[Byte]): Unit
+```
+```
+def memcpy(dst: RawPtr, src: RawPtr, count: CSize): RawPtr
+```
+
+---
+
+### Handling `String`s
+
+```
+def toCString(str: String)(implicit z: Zone): CString
+```
+
+```
+def fromCString(cstr: CString,
+                charset: Charset = Charset.defaultCharset()): String
+```
+
+---
+
+### Extern objects and linking libraries
+
+```
+@native.link("mylib")
+@native.extern
+object mylib {
+  def f(): Unit = native.extern
+}
+```
+
+---
+
+### Structs
+
+```
+type MyStructWith2Fields = CStruct2[CString, CString]
+```
+
+---
+
+### Pointers:
+
+| Operation	        | C syntax  |   Scala Syntax |
+|-|-|-|
+| As function argument | char* | Ptr[CChar] |
+| Load value        | *ptr |	!ptr |
+| Store value       | *ptr = value |	!ptr = value |
+| Load at index     | ptr[i]	| ptr(i) |
+| Store at index	| ptr[i] = value	| ptr(i) = value |
+| Load a field      | ptr->name	| !ptr._N |
+| Store a field     | ptr->name = value	| !ptr._N = value |
+
+---
+
+### Function pointers
+
+the following signature in C:
+```
+void foo(void (* f)(char *));
+```
+can be declared as following:
+
+```
+def foo(f: CFunctionPtr1[CString, Unit]): Unit = native.extern
+```
+
+To pass a Scala function to CFunctionPtr1, you need to use the conversion function CFunctionPtr.fromFunction1():
+
+```
+def f(s: CString): Unit = ???
+foo(CFunctionPtr.fromFunction1(f))
+```
+
+---
+
+# For more details, go to the [documentation](http://www.scala-native.org/en/v0.3.8/user/interop.html#interop).
+
+-----
+
+### Task 5
+
+```
+sbt> groll next
+```
+
+Send a HTTP request to obtain your IP (e.g. `GET https://api.ipify.org`).
+
+The application should print out the IP to standard output.
+
+### Hints
+
+The [com.tapad.curl.CCurl](curl/src/main/scala/com/tapad/curl/CCurl.scala) class
+already contains a subset of functions exposed from [curl.h](https://github.com/curl/curl/blob/master/include/curl/curl.h).
+
+Consider wrapping it up in a more convenient object.
+
+C code examples for handling HTTP requests using curl can be found [here](https://curl.haxx.se/libcurl/c/example.html).
+
+-----
+
+### Task 6
+
+```
+sbt> groll next
+```
+
+Instead of using a one-off implementation of the Curl wrapper, consider using STTP.
+
+### Goal
+
+Send the request from task 5 using [STTP](https://github.com/softwaremill/sttp/blob/master/docs/backends/native/curl.rst).
+
+Mind the note.
 
 -----
 # Linking
@@ -229,66 +464,6 @@ $
 ```
 
 -----
-# Power of Markdown in your presentation
-Place you content in **content.md**.
-
-Separate slides horizontally with **5 dashes** and vertically with **3 dashes**.
----
-Welcome to the *basement*
------
-# headers
-## headers
-### headers
-#### headers
-##### headers
-###### headers
------
-Nicely highlighted code...
-```scala
-/** Basic command line parsing. */
-object Main {
-  var verbose = false
-
-  def main(args: Array[String]) {
-    for (a <- args) a match {
-      case "-h" | "-help"    =>
-        println("Usage: scala Main [-help|-verbose]")
-      case "-v" | "-verbose" =>
-        verbose = true
-      case x =>
-        println("Unknown option: '" + x + "'")
-    }
-    if (verbose)
-      println("How are you today?")
-  }
-}
-```
-...also the inlined one: `def foo(bar: String): Unit`.
------
-# Links
-[http://tapad.com](http://tapad.com)
------
-# Images
-![tapad-logo](img/TAPAD_eps_green.png)
------
-# Lists
-* item 1
-* item 2
-* item 3
------
-# Notes
-Speaker notes can be placed after `Note:`
-Note: This will only appear in the speaker notes window.
------   
-<!-- .slide: data-background="#9B2743" -->
-You can even change background...
------
-<!-- .slide: data-background="#B7BF10" style="color: #9B2743;" -->
-...and font color.
------
-###### No more Power Point!
 
 ##### WITH *&#x2764;* FROM
-# Data Platform Oslo!
-
-`sbt new Tapad/reveal.js.g8`
+# TAPAD Oslo!
