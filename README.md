@@ -3,6 +3,7 @@
 ## Content
 
 1. [Hello, World!](./1_hello_world.md)
+1. [Parsing CLI arguments](./2_parsing_cli.md)
 
 ## Navigation
 
