@@ -35,5 +35,13 @@ object CurlHttp {
     responseBody
   }
 
-  private def writeData(ptr: Ptr[Byte], size: CSize, nmemb: CSize, data: Ptr[CurlFetch]): CSize = ???
+  private def writeData(ptr: Ptr[Byte], size: CSize, nmemb: CSize, data: Ptr[CurlFetch]): CSize = {
+    val index: CSize = !data._2
+    val increment: CSize = size * nmemb
+    !data._2 = !data._2 + increment
+    !data._1 = realloc(!data._1, !data._2 + 1)
+    memcpy(!data._1 + index, ptr, increment)
+    !(!data._1).+(!data._2) = 0.toByte
+    size * nmemb
+  }
 }
