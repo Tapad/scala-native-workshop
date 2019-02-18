@@ -4,6 +4,7 @@
 
 1. [Hello, World!](./1_hello_world.md)
 2. [Library and application](./2_lib_and_app.md)
+3. [Parsing CLI arguments](./3_parsing_cli.md)
 
 ## Navigation
 
