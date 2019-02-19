@@ -30,6 +30,19 @@ Note: These techniques allows us to essentially replace C programs with Scala.
     
 
 -----
+# Short compiler overview
+
+Scala Native replaces `scalac` with it's own compiler, it follows a common high level compiler architecture
+
+![Simple compiler](img/SimpleCompiler.png)
+
+* Frontend takes Scala code to an intermediary representation called NIR
+* NIR is what we'll package in our JARs and distribute
+* Backend produces machine code from NIR
+
+Scala Native is actually just a frontend in a larger compiler infrastructure called "LLVM"
+
+----- 
 
 # In this workshop
 
@@ -52,9 +65,12 @@ git clone git@github.com:Tapad/scala-native-workshop.git
 ```
 +
 ```
-brew install llvm
-brew install bdw-gc re2 # optional
+brew install llvm # Needed to build
+brew install bdw-gc re2 # Optional, but will be required by this CLI. Please install these as well. 
 ```
+
+Note: bdw-gc is the garbage collector, re2 is regular expression support
+
 -----
 
 # Basic SBT commands
@@ -89,11 +105,11 @@ Yes and no.
 
 #### Scala Native key differentiators:
 
-* low-level memory semantics, with elegant support to arrays, structs, and pointer arithmetic
+* Low-level memory semantics, with elegant support to arrays, structs, and pointer arithmetic
 
-* one can switch from close-to-metal code to idiomatic Scala seamlessly
+* One can switch from close-to-metal code to idiomatic Scala seamlessly
 
-* more suitable for systems programming glue-up code
+* More suitable for systems programming glue-up code
 
 -----
 
