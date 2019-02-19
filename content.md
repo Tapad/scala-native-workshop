@@ -142,10 +142,6 @@ NIR [docs](https://github.com/scala-native/scala-native/blob/master/docs/contrib
 
 ### Task 3
 
-```
-sbt> groll next
-```
-
 Parse CLI arguments.
 * support toggle `--exclamation` which adds `!` after the greeting, and `name` to greet as the last parameter
 * `--help` should print out a help message
@@ -162,9 +158,6 @@ whereas `%%%` adds also Scala Native Version (e.g. `_0.3_2.11`).
 
 ### Task 4
 
-```
-sbt> groll next
-```
 
 Add logging capabilities to your application.
 
@@ -183,25 +176,25 @@ Consider [Slogging](https://github.com/jokade/slogging#scala-native) or your own
 
 ### Basic memory management
 
-```
+```scala
 Zone { implicit z =>
   val buffer = alloc[Byte](n)
 }
 ```
 or well-known `stdlib` and `libc` functions:
-```
+```scala
 def malloc(size: CSize): Ptr[Byte]
 ```
-```
+```scala
 def calloc(num: CSize, size: CSize): Ptr[Byte]
 ```
-```
+```scala
 def realloc(ptr: Ptr[Byte], newSize: CSize): Ptr[Byte]
 ```
-```
+```scala
 def free(ptr: Ptr[Byte]): Unit
 ```
-```
+```scala
 def memcpy(dst: RawPtr, src: RawPtr, count: CSize): RawPtr
 ```
 
@@ -209,20 +202,24 @@ def memcpy(dst: RawPtr, src: RawPtr, count: CSize): RawPtr
 
 ### Handling `String`s
 
-```
+```scala
 def toCString(str: String)(implicit z: Zone): CString
 ```
 
-```
+```scala
 def fromCString(cstr: CString,
                 charset: Charset = Charset.defaultCharset()): String
+```
+
+```scala
+val msg: CString = c"Hello, world!"
 ```
 
 ---
 
 ### Extern objects and linking libraries
 
-```
+```scala
 @native.link("mylib")
 @native.extern
 object mylib {
@@ -234,7 +231,7 @@ object mylib {
 
 ### Structs
 
-```
+```scala
 type MyStructWith2Fields = CStruct2[CString, CString]
 ```
 
@@ -257,18 +254,18 @@ type MyStructWith2Fields = CStruct2[CString, CString]
 ### Function pointers
 
 the following signature in C:
-```
+```scala
 void foo(void (* f)(char *));
 ```
 can be declared as following:
 
-```
+```scala
 def foo(f: CFunctionPtr1[CString, Unit]): Unit = native.extern
 ```
 
 To pass a Scala function to CFunctionPtr1, you need to use the conversion function CFunctionPtr.fromFunction1():
 
-```
+```scala
 def f(s: CString): Unit = ???
 foo(CFunctionPtr.fromFunction1(f))
 ```
@@ -280,10 +277,6 @@ foo(CFunctionPtr.fromFunction1(f))
 -----
 
 ### Task 5
-
-```
-sbt> groll next
-```
 
 Send a HTTP request to obtain your IP (e.g. `GET https://api.ipify.org`).
 
@@ -301,10 +294,6 @@ C code examples for handling HTTP requests using curl can be found [here](https:
 -----
 
 ### Task 6
-
-```
-sbt> groll next
-```
 
 Instead of using a one-off implementation of the Curl wrapper, consider using STTP.
 
