@@ -77,4 +77,4 @@ lazy val app = project
   .settings( // Provide linking settings for linking from SBT
     nativeLinkStubs := true,
     nativeLinkingOptions += "-L/usr/local/opt/curl/lib")
-  .dependsOn(common)
+  .dependsOn(common, curl)

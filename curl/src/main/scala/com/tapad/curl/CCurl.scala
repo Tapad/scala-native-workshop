@@ -7,6 +7,9 @@ private[curl] trait Curl {}
 @link("curl")
 @extern
 private[curl] object CCurl {
+  @name("curl_global_init")
+  def globalInit(flags: Long): Unit = extern
+
   @name("curl_easy_init")
   def init: Ptr[Curl] = extern
 
