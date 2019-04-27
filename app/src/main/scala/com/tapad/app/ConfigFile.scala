@@ -17,10 +17,14 @@ object ConfigFile {
     val configPath = Paths.get(defaultConfigPath)
 
     if (Files.exists(configPath)) {
-      // Follow the example in https://github.com/ekrich/sconfig/blob/master/docs/SCALA-NATIVE.md
+      val bytes = Files.readAllBytes(configPath)
+      val configString = new String(bytes)
 
-      // Read file into a string and then ConfigFactory.parseString
-      ???
+      val config = ConfigFactory.parseString(configString)
+
+      if (config.hasPath(AuthenticationToken))
+        Some(ConfigFile(config.getString(AuthenticationToken)))
+      else None
     } else None
 
   }
