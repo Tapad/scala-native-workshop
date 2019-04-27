@@ -27,7 +27,8 @@ lazy val app = project
     libraryDependencies ++= Seq(
       "org.rogach" %%% "scallop" % "3.1.5",
       "biz.enef" %%% "slogging" % "0.6.1",
-      "com.softwaremill.sttp" %%% "core" % "1.5.0"
+      "com.softwaremill.sttp" %%% "core" % "1.5.0",
+      "org.ekrich" %%% "sconfig" % "0.8.0"
     )
   )
   .settings(
