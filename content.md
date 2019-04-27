@@ -7,14 +7,27 @@
 
 Scala Native can take a Scala program with objects, traits, higher kinded types etc. and translate it down to the same the same kind of executable machine code that you would've got from a C compiler.
 
------
+---
+
+# LLVM
+
+Multiple "frontends" are compiled to an intermediary representation (IR) which is processed by various "backends"
+
+![LLVM pipeline](img/LLVMCompiler1.png)
+
+You can write C-style programs in Scala Native, with all the performance and all the drawbacks 
+
+Note: This is not LLVM specific, all modern compilers looks like this
+
+Backends doesn't have to be AOT. Wide variety: There's also a JIT backend for IR, or you could compile C++ to Java Byte Code.
+
+If 
+
+---
 
 # Scala Native
 
-> Systems programming is the art of writing code while remaining aware of the properties and limitations of the machine that will run it.<br>
-> _- Modern Systems Programming with Scala Native_
-
-In addition, Scala Native adds powerful capabilities to work closer with the "bare metal"
+Scala Native adds powerful capabilities to work closer with the "bare metal"
 
 * Elementary data types such as `struct`s, `pointer`s, low-level byte strings etc. are easy to work with. No need for `JNI` or `Unsafe`.
 * Use system level shared libraries and C-style memory management
@@ -28,28 +41,20 @@ Note: These techniques allows us to essentially replace C programs with Scala.
   * Build with SBT and publish to Maven Central as usual
   * Use ScalaTest and friends
     
+Write critical path with manual memory management. Example folding vs reusing memory. 
 
 -----
-# Short compiler overview
-
-Scala Native replaces `scalac` with it's own compiler, it follows a common high level compiler architecture
-
-![Simple compiler](img/SimpleCompiler.png)
-
-* Frontend takes Scala code to an intermediary representation called NIR
-* NIR is what we'll package in our JARs and distribute
-* Backend produces machine code from NIR
-
-Scala Native is actually just a frontend in a larger compiler infrastructure called "LLVM"
-
------ 
 
 # In this workshop
 
 * We're going to create a CLI that invokes remote HTTP APIs
-* Package and distribute the application source code as well as pre-linked binaries
+* Get hands on with manual memory management 
 
-Note: Don't worry about what "pre-linked binaries" mean
+
+```sbtshell
+# See the plan!
+sbt> groll list
+```
 
 -----
 
@@ -66,7 +71,8 @@ git clone git@github.com:Tapad/scala-native-workshop.git
 +
 ```
 brew install llvm # Needed to build
-brew install bdw-gc re2 # Optional, but will be required by this CLI. Please install these as well. 
+brew install bdw-gc re2 jansson # Optional, but will be required by this CLI. Please install these as well.
+brew install curl # This is "keg-only", it won't replace your `curl`, but enables us to link against the newest library version 
 ```
 
 Note: bdw-gc is the garbage collector, re2 is regular expression support
@@ -113,64 +119,25 @@ Yes and no.
 
 -----
 
-### Task 1 -- Getting started
+### Tasks
 
-In the cloned project run `sbt`, and `groll initial`.
-Then,
+* Browse the tasks at https://github.com/Tapad/scala-native-workshop
+* Start on the first task
+
+```sbtshell
+sbt> groll initial
 ```
-sbt> run <your-name>
-```
 
------
+To see the solution
 
-### Task 2
-
-```
+```sbtshell
+# This will overwrite your changes!
 sbt> groll next
 ```
 
-Split the logic into library and application.
-* Create a library with a function that generates a `greeting` for a given name.
-* Build the binary, and run it outside of SBT.
-
-### Worth looking
-
-Check out intermediate representation in a `.nir` file.
-NIR [docs](https://github.com/scala-native/scala-native/blob/master/docs/contrib/nir.rst).
-
 -----
 
-### Task 3
-
-Parse CLI arguments.
-* support toggle `--exclamation` which adds `!` after the greeting, and `name` to greet as the last parameter
-* `--help` should print out a help message
-
-### Hints
-
-We can use regular Scala library (e.g. `scallop` in this case).
-
-Normally in SBT, `%%` adds Scala version suffix (e.g. `_2.11`),
-
-whereas `%%%` adds also Scala Native Version (e.g. `_0.3_2.11`).
-
------
-
-### Task 4
-
-
-Add logging capabilities to your application.
-
-The application should support running in a debug mode if `--debug` arguments is passed in.
-
-### Hints
-
-Consider [Slogging](https://github.com/jokade/slogging#scala-native) or your own solution.
-
------
-
-# Interoperability with C
-
+# 4 - Interoperability with C
 
 ---
 
@@ -274,34 +241,6 @@ foo(CFunctionPtr.fromFunction1(f))
 
 # For more details, go to the [documentation](http://www.scala-native.org/en/v0.3.8/user/interop.html#interop).
 
------
-
-### Task 5
-
-Send a HTTP request to obtain your IP (e.g. `GET https://api.ipify.org`).
-
-The application should print out the IP to standard output.
-
-### Hints
-
-The [com.tapad.curl.CCurl](curl/src/main/scala/com/tapad/curl/CCurl.scala) class
-already contains a subset of functions exposed from [curl.h](https://github.com/curl/curl/blob/master/include/curl/curl.h).
-
-Consider wrapping it up in a more convenient object.
-
-C code examples for handling HTTP requests using curl can be found [here](https://curl.haxx.se/libcurl/c/example.html).
-
------
-
-### Task 6
-
-Instead of using a one-off implementation of the Curl wrapper, consider using STTP.
-
-### Goal
-
-Send the request from task 5 using [STTP](https://github.com/softwaremill/sttp/blob/master/docs/backends/native/curl.rst).
-
-Mind the note.
 
 -----
 # Linking
@@ -313,70 +252,6 @@ The first version of our application is now finished. Now we only need to link i
 * Link the application up-front to a set of operating systems and CPU architectures
 * Distribute source code along with linked binaries through Homebrew
 
-Note: I promised to explain "pre-linked binaries". Let's see what's happening under the hood. 
-
------
-# What _is_ Scala Native
-
-* Scala Native is not a "native compiler"
-* It's a "LLVM frontend"
-
------
-
-# LLVM Compiler Infrastructure
-
-> Despite its name, LLVM has little to do with traditional virtual machines.<br>
-> _- llvm.org_
-
-* Umbrella term, not an acronym. LLVM is the name of the project
-* It's a "closely knit" set of compilers, linkers, assemblers, debuggers, static analyzers etc. that works well together
-* Can be used to compile various high level languages to various platforms, CPU architectures etc.  
-
------
-
-# LLVM overview
-
-Multiple "frontends" are compiled to an intermediary representation (IR) which is processed by various "backends"
-
-![LLVM pipeline](img/LLVMCompiler1.png)
-
-Note: This is not LLVM specific, all modern compilers looks like this
-
-Compare with the JVM: Scala, Groovy, Jython etc.
-
-Backends doesn't have to be AOT. Wide variety: There's also a JIT backend for IR, or you could compile C++ to Java Byte Code.
-
----
-# LLVM and the JVM
-
-* LLVM and the JVM are register and stack machines respectively
-* LLVM IR is a much lower level representation than Java Byte Code
-  * No garbage collection
-  * No classes etc. in the intermediate representation\* 
-* LLVM is more modular than the JVM, it support use cases such as
-  * Compile Java code to native ARM or x86
-  * Compile Haskell to PHP IR
-* LLVM can perform AOT or compile to various intermediate formats
-  * It also ships with its own JIT than runs on IR  
-  
-This is not good vs bad, it's just different approaches to producing assembly language
-
------
-
-# Terminology refresh
-
-* What is an executable file, or "binary"?
-* AOT and JIT compilers
-* Intermediate representation (IR)
-* Compiling vs linking applications
-* Static and dynamic linking
-
-Note:
-
-Application: x86 + syscalls + executable file format (entry point, exit code, etc.)
-AOT/JIT: Certain optimizations only possible in AOT and JIT respectively
-Static & dynamic linking <=> Fat jars or not
-
 -----
 # Distribution plan
 
@@ -386,7 +261,7 @@ Static & dynamic linking <=> Fat jars or not
 
 \* In this workshop we're using localhost instead
 -----
-# 7 - Coursier
+# 8 - Coursier
 
 > Pure artifact fetching <br>+<br>JAR ⇒ Binary
  
@@ -397,7 +272,7 @@ Static & dynamic linking <=> Fat jars or not
 ![coursier](img/coursier-launch.gif)
 
 ----- 
-# 7 - Coursier
+# 8 - Coursier
 
 Use [coursier](https://github.com/coursier/coursier) to link a macOS or Linux binary from the application JARs. Add your coursier command to the supplied `Makefile`.
 
@@ -413,7 +288,7 @@ Hello, wombat
 Your IP is: 85.117.48.11
 ```
 -----
-# 8 - Homebrew 🍺
+# 9 - Homebrew 🍺
 
 Homebrew is a package manager for Linux and macOS (and Windows through WSL)
 
@@ -447,7 +322,7 @@ $ brew install --build-from-source ~/.ivy2/local/com.tapad.workshop/homebrew/0.0
 ```
 
 -----
-# 9 - Building bottles
+# 10 - Building bottles
 
 So far we have what we need to assemble binaries for various platforms. Now we're going to to tie it all together.
 
@@ -455,7 +330,7 @@ So far we have what we need to assemble binaries for various platforms. Now we'r
 
 ---
 
-## 9 - Building bottles
+## 10 - Building bottles
 
 Create scripts that are run by CI on pull requests and master branch
 
