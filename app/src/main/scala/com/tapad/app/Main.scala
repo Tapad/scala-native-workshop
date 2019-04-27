@@ -19,7 +19,12 @@ object Main {
     println(greet)
 
     ConfigFile.load() match {
-      case Some(config) => println(s"Read config $config")
+      case Some(config) =>
+        val repos: String = sttp.get(uri"https://api.github.com/user/repos").header(???)
+        val jvalue: List[GitHubRepo] = ???
+        // https://github.com/MediaMath/scala-json/blob/master/docs/USAGE.md#case-class-usage
+        println(jvalue.map(_.full_name))
+
       case None => println(s"Config not found ${ConfigFile.defaultConfigPath}")
     }
 
