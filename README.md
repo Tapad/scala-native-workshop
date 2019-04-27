@@ -8,6 +8,7 @@
 1. [Curl based HTTP requests](./4_curl_request.md)
 1. [Using STTP for HTTP requests](./5_sttp.md)
 1. [Using configuration file](./6_configuration_file.md)
+1. [Parsing JSON](./7_json_parsing.md)
 
 ## Navigation
 

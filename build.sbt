@@ -2,7 +2,8 @@ inThisBuild {
   Seq(
     scalaVersion := "2.11.12",
     nativeLinkStubs := true, // Set to false or remove if you want to show stubs as linking errors
-    organization := "com.tapad.workshop"
+    organization := "com.tapad.workshop",
+    resolvers += "mmreleases" at "https://artifactory.mediamath.com/artifactory/libs-release-global"
   )
 }
 
@@ -28,7 +29,8 @@ lazy val app = project
       "org.rogach" %%% "scallop" % "3.1.5",
       "biz.enef" %%% "slogging" % "0.6.1",
       "com.softwaremill.sttp" %%% "core" % "1.5.0",
-      "org.ekrich" %%% "sconfig" % "0.8.0"
+      "org.ekrich" %%% "sconfig" % "0.8.0",
+      "com.mediamath" %%% "scala-json" % "1.1"
     )
   )
   .settings(
