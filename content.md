@@ -72,7 +72,6 @@ git clone git@github.com:Tapad/scala-native-workshop.git
 ```
 brew install llvm # Needed to build
 brew install bdw-gc re2 jansson # Optional, but will be required by this CLI. Please install these as well.
-brew install curl # This is "keg-only", it won't replace your `curl`, but enables us to link against the newest library version 
 ```
 
 Note: bdw-gc is the garbage collector, re2 is regular expression support
