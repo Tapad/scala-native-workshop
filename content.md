@@ -1,4 +1,11 @@
 # Scala Native Workshop
+
+Note:
+
+* In this workshop, very hands on
+* Create a CLI with common components
+* Get hands on with programming with pointers and memory management 
+
 -----
 # Scala Native
 
@@ -6,6 +13,12 @@
 > _- scala-native.org_
 
 Scala Native can take a Scala program with objects, traits, higher kinded types etc. and translate it down to the same the same kind of executable machine code that you would've got from a C compiler.
+
+Note:
+
+* Multi-platform languages are all the rage these days
+* Scala native is an AOT compiler for Scala
+* It means …
 
 ---
 
@@ -17,11 +30,12 @@ Multiple "frontends" are compiled to an intermediary representation (IR) which i
 
 You can write C-style programs in Scala Native, with all the performance and all the drawbacks 
 
-Note: This is not LLVM specific, all modern compilers looks like this
+Note: 
 
-Backends doesn't have to be AOT. Wide variety: There's also a JIT backend for IR, or you could compile C++ to Java Byte Code.
-
-If 
+* It happens through a compiler infrastructure called LLVM 
+* This is the same compiler infrastructure that is used for …
+* Meaning you can write C programs in Scala and get …
+* You get all the performance, but have to pay 
 
 ---
 
@@ -30,18 +44,24 @@ If
 Scala Native adds powerful capabilities to work closer with the "bare metal"
 
 * Elementary data types such as `struct`s, `pointer`s, low-level byte strings etc. are easy to work with. No need for `JNI` or `Unsafe`.
+* Example: `Ptr[Int]`
 * Use system level shared libraries and C-style memory management
 * Reuse existing tools and infrastructure in the Scala/Java ecosystem
 
-Note: These techniques allows us to essentially replace C programs with Scala.
+Note:
+
+* SN gives useful primitives for low-level programming, for example …, not need JNI
+* Since we're running as assembly level, we have no runtime, so no type information and no reflection
+* Typically when using SN, … C-libraries, high-level shell, low-level performance
+
+Why?
 
 * Smaller memory footprint
 * No JIT warmup phase at application startup
 * Reuse the existing Scala and Java ecosystem
   * Build with SBT and publish to Maven Central as usual
   * Use ScalaTest and friends
-    
-Write critical path with manual memory management. Example folding vs reusing memory. 
+     
 
 -----
 
@@ -50,11 +70,6 @@ Write critical path with manual memory management. Example folding vs reusing me
 * We're going to create a CLI that invokes remote HTTP APIs
 * Get hands on with manual memory management 
 
-
-```sbtshell
-# See the plan!
-sbt> groll list
-```
 
 -----
 
@@ -124,15 +139,22 @@ Yes and no.
 * Start on the first task
 
 ```sbtshell
+# See the plan!
+sbt> groll list
+
+# Start on task one
 sbt> groll initial
-```
 
-To see the solution
+# See solution
+sbt> groll next
 
-```sbtshell
-# This will overwrite your changes!
+# Run groll next again to proceed to next task (NB! This will overwrite your changes)
 sbt> groll next
 ```
+
+Note:
+
+* Root project when groll next
 
 -----
 
