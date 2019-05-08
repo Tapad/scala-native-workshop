@@ -69,3 +69,6 @@ Why?
 
 * We're going to create a CLI that invokes remote HTTP APIs
 * Get hands on with manual memory management 
+
+
+### [Workshop repository](https://github.com/tapad/scala-native-workshop)
